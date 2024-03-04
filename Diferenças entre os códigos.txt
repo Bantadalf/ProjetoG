@@ -1,0 +1,29 @@
+Diferenças entre os códigos:
+
+1 - Estética do código:
+Nosso: linha corrida com todos os comandos;
+Dele: cada comando é separado por "\";
+
+2 - Todos os reads são feitos dentro de uma função que já começa o tratamento de dados:
+Nosso: lemos o arquivo e o atribuímos a um dataframe e depois, prosseguimos com o tratamento do dataframe especificado;
+Dele: o arquivo é atribuído ao dataframe e todo o tratamento específico é feito dentro da função;
+
+3 - Atribuição de Alias para os imports de bibliotecas utilizadas no código:
+Nosso: não fazemos isso;
+Dele: todo e qualquer import é antecedido pelo alias correspondente à biblioteca utilizada;
+
+4 - Spark Session:
+Nosso: a sessão é aberta apenas uma vez no começo do código;
+Dele: a sessão é aberta como um dos parâmetros da função;
+
+5 - Função CNPJ validado:
+Nosso: uma função foi criada manualmente  para aplicar a validação do cnpj;
+Dele: importou uma função que validava o cnpj de uma biblioteca existente;
+
+6 - Subtract dos rejeitados:
+Nosso: utilizamos o comando nativo do pyspark ".subtract" entre os dois dataframes;
+Dele: criação de um index para depois utilizar "subtract_by_index" dentro de uma função lambda;
+
+7 - Função Gerar Parcelas:
+Nosso: criamos uma função python que através de um loop foi capaz de gerar as parcelas de cada uma das NFs
+Dele: utilizou dos comandos nativos "sequence" e "explode" para gerar as parcelas
