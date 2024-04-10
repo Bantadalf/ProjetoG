@@ -23,3 +23,19 @@ Sintaxe no PySpark:
 O PySpark escolhe automaticamente a estratégia de join apropriada com base no tamanho dos DataFrames, na memória disponível e em outros fatores. Normalmente, não é necessário especificar explicitamente a estratégia de junção.
 No entanto, é possível influenciar a estratégia de junção usando dicas ou ajustando os parâmetros de configuração relacionados às junções de difusão.
 Em resumo,  o broadcast nested loop join no PySpark combina os benefícios da difusão de DataFrames menores e da execução de junções de laço aninhado, resultando em operações de junção eficientes ao minimizar o embaralhamento de dados e a sobrecarga da rede.
+
+O hash match join é um algoritmo de junção amplamente utilizado em sistemas de banco de dados, incluindo frameworks de computação distribuída como o PySpark. Ele é projetado para unir conjuntos de dados grandes, particionando e fazendo o hash dos dados com base nas chaves de junção, minimizando assim a quantidade de transferência de dados pela rede.
+
+Antes de realizar a operação de junção, ambos os DataFrames envolvidos são particionados com base em suas chaves de junção. Cada partição é então hashada com base nas chaves de junção. Esse processo de hash distribui os dados em várias partições, garantindo que as linhas com as mesmas chaves de junção acabem na mesma partição.
+
+Depois que os DataFrames são particionados e hashados, são construídas tabelas hash para cada partição do DataFrame interno. Essas tabelas hash armazenam as linhas do DataFrame interno, indexadas por suas chaves de junção hashadas.
+
+Durante a fase de sonda, o Spark itera sobre cada partição do DataFrame externo. Para cada linha no DataFrame externo, o Spark calcula o valor hash de sua chave de junção e procura a tabela hash correspondente nas partições do DataFrame interno. Se uma correspondência for encontrada (ou seja, uma linha com a mesma chave de junção existe na tabela hash), o Spark combina as linhas correspondentes dos DataFrames externo e interno.
+
+O hash match join é altamente eficiente para conjuntos de dados grandes porque minimiza a transferência de dados pela rede. Ao particionar e fazer o hash dos dados, o Spark pode distribuir a operação de junção entre vários nós do cluster, permitindo processamento paralelo. A operação de pesquisa na tabela hash é tipicamente muito rápida, especialmente se a tabela hash couber na memória. Este algoritmo de junção é adequado para equi-joins, onde as linhas são correspondidas com base na igualdade das chaves de junção.
+
+O hash match join é comumente usado no PySpark para unir eficientemente grandes conjuntos de dados distribuídos. É particularmente eficaz quando ambos os DataFrames são grandes e podem ser eficientemente particionados e hashados com base em suas chaves de junção. Este algoritmo de junção é adequado para vários tipos de operações de junção, incluindo junções internas, externas e semi-junções.
+
+Como outros algoritmos de junção, o PySpark escolhe automaticamente a estratégia de junção apropriada com base em fatores como tamanho do DataFrame, memória disponível e outras regras de otimização. Normalmente, não é necessário especificar explicitamente o hash match join, pois o PySpark o trata internamente. No entanto, você pode influenciar a estratégia de junção usando dicas ou ajustando os parâmetros de configuração relacionados à otimização da junção.
+
+Em resumo, o hash match join no PySpark une eficientemente grandes conjuntos de dados distribuídos por meio de particionamento, hash e construção de tabelas hash, resultando em uma minimização da transferência de dados pela rede e operações de junção de alto desempenho.
