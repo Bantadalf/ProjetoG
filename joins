@@ -1,0 +1,25 @@
+O join "Cartesian Product", também conhecido como cross join, é um tipo de operação de join que combina cada linha de um DataFrame com cada linha de outro DataFrame. Isso significa que, para cada linha do primeiro DataFrame, ela será emparelhada com todas as linhas do segundo DataFrame, resultando em um DataFrame de saída potencialmente grande. Casos de uso: Cartesian joins raramente são usados na prática, devido ao seu custo computacional e aos grandes tamanhos de output que podem ser gerados. Eles são normalmente usados ​​quando você deseja gerar explicitamente todas as combinações possíveis entre dois DataFrames, como em certos tipos de análise de dados ou ao executar operações específicas que exigem tais combinações.
+
+O "broadcast nested loop join" é um tipo específico de estratégia de junção usada em estruturas de computação distribuída como o PySpark, que visa otimizar o desempenho das operações de join, reduzindo o embaralhamento de dados e minimizando a quantidade de transferência de dados pela rede. Uma breve explicação de cada componente desse tipo de junção:
+Broadcast Join:
+No PySpark, um broadcast join envolve a transmissão de um dos DataFrames envolvidos na operação de join para todos os nós de trabalho no cluster. Transmitir significa enviar uma cópia do DataFrame menor para cada nó de trabalho.
+Isso é viável quando um dos DataFrames envolvidos na operação de join é relativamente pequeno e pode caber confortavelmente na memória de todos os nós de trabalho. O outro DataFrame, normalmente maior, permanece distribuído entre os nós.
+Ao transmitir o DataFrame menor, o Spark pode evitar embaralhar todos os dados de ambos os DataFrames na rede, reduzindo assim a sobrecarga de transferência de dados.
+Nested Loop Join:
+Um nested loop join é um algoritmo de junção clássico usado em bancos de dados em que cada linha em um DataFrame (DataFrame externo) é comparada com cada linha no outro DataFrame (DataFrame interno).
+Para cada linha no DataFrame externo, o Spark itera sobre todas as linhas no DataFrame interno, verificando se há chaves de junção correspondentes.
+Essa abordagem é direta, mas pode ser ineficiente, especialmente para DataFrames grandes, pois envolve um grande número de comparações.
+Broadcast Nested Loop Join:
+Combinando as duas estratégias, o broadcast nested loop join aproveita os benefícios de ambas as abordagens.
+Primeiro, ele transmite o DataFrame menor para todos os nós de trabalho.
+Em seguida, executa um loop join aninhado entre o DataFrame transmitido (DataFrame externo) e o DataFrame não transmitido (DataFrame interno).
+Uma vez que o DataFrame mais pequeno está agora disponível em todos os nós de trabalho, cada nó pode executar de forma independente o nested loop join com a sua parte do DataFrame maior, evitando a necessidade de baralhar dados na rede.
+Essa abordagem é particularmente eficaz quando o DataFrame menor pode ser transmitido de forma eficiente e o DataFrame maior pode ser particionado entre os nós de trabalho.
+Casos de uso:
+Os broadcast nested loop join são adequados quando um dos DataFrames envolvidos na operação de junção é suficientemente pequeno para caber na memória de todos os nós de trabalho.
+É frequentemente utilizada em cenários em que o DataFrame mais pequeno é o resultado de uma operação de filtro ou de uma tabela de dimensão num esquema em estrela no armazenamento de dados.
+Essa estratégia de junção pode melhorar significativamente o desempenho das operações de join, especialmente ao lidar com grandes conjuntos de dados distribuídos.
+Sintaxe no PySpark:
+O PySpark escolhe automaticamente a estratégia de join apropriada com base no tamanho dos DataFrames, na memória disponível e em outros fatores. Normalmente, não é necessário especificar explicitamente a estratégia de junção.
+No entanto, é possível influenciar a estratégia de junção usando dicas ou ajustando os parâmetros de configuração relacionados às junções de difusão.
+Em resumo,  o broadcast nested loop join no PySpark combina os benefícios da difusão de DataFrames menores e da execução de junções de laço aninhado, resultando em operações de junção eficientes ao minimizar o embaralhamento de dados e a sobrecarga da rede.
